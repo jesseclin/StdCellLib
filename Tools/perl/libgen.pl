@@ -23,7 +23,7 @@ library(ls05_stdcells) {
   current_unit : "1uA";
   pulling_resistance_unit : "1kohm";
   leakage_power_unit : "1nW";
-  capacitive_load_unit (1,pf);
+  capacitive_load_unit (1.0,pf);
 
   slew_upper_threshold_pct_rise : 80;
   slew_lower_threshold_pct_rise : 20;
@@ -34,11 +34,11 @@ library(ls05_stdcells) {
   output_threshold_pct_rise : 50;
   output_threshold_pct_fall : 50;
   nom_process : 1;
-  nom_voltage : 5;
+  nom_voltage : 1.8;
   nom_temperature : 25;
   operating_conditions ( typical ) {
      process : 1;
-     voltage : 5;
+     voltage : 1.8;
      temperature : 25;
   }
   default_operating_conditions : typical;
@@ -229,6 +229,10 @@ EOF
   ff (DS0000,P0000) {
     next_state : "D";
     clocked_on : "(!CLK)";
+    clear : "R" ;
+    preset : "S" ;
+    clear_preset_var1 : H ;
+    clear_preset_var2 : H ;
   }
 EOF
     ;
@@ -408,8 +412,19 @@ area : $area;
   cell_leakage_power : 0.1173;
 EOF
     ;
-    if($cellname=~m/DFF/)
+    if($cellname=~m/DFFSR/)
     {
+      $output.=<<EOF
+  ff (IQ,IQN) {
+    next_state : "D";
+    clocked_on : "CLK";
+    clear : "(!R)";
+    preset : "(!S)";
+    clear_preset_var1 : L;
+  }
+EOF
+    ;
+    } elsif ($cellname=~m/DFF/) {
       $output.=<<EOF
   ff (DS0000,P0000) {
     next_state : "D";
@@ -429,6 +444,9 @@ EOF
       ;
     }
     my $truthtable=`perl ../Tools/perl/truthtable.pl --format liberty $cellname.cell`;
+    if($cellname=~m/DFFSR/) {
+      $truthtable =~ s/function: \"(.*)\"/function: \"IQ\"/; 
+    }
     $output.=$truthtable;
     my %functions=();
     #foreach(split "\n",$truthtable)

@@ -11,7 +11,7 @@ $ENV{'PySpiceLogLevel'}="DEBUG" if($debug);
 $ENV{'PySpiceLogLevel'}="ERROR" if(!$debug);
 #undef($ENV{'PySpiceLogLevel'}) unless($debug);
 
-my $lctimeparams="--output-loads 0.0005,0.05,0.1,0.2,1 --slew-times 0.01,0.05,0.1,0.2,1.5";
+my $lctimeparams="--output-loads 0.0005,0.05,0.1,0.2,1 --slew-times 0.01,0.05,0.1,0.2,1.5 --related-pin-transition 0.01,0.05,0.1,0.2,1.5";
 if(open IN,"<../Tech/lctime.conf")
 {
   $lctimeparams=<IN>; $lctimeparams=~tr/\r\n//;
@@ -106,7 +106,8 @@ while(<IN>)
       undef $/;
       my $magcontent=<MAGIN>;
       $/=$old;
-      $magcontent=~s/tech sky130A/tech sky130A\nmagscale 1 2/s;
+      #$magcontent=~s/tech sky130A/tech sky130A\nmagscale 1 2/s;
+      $magcontent=~s/magscale 1 1/magscale 1 2/s;
       $magcontent=~s/<< abutment >>\nrect /<< properties >>\nstring FIXED_BBOX /s;
       print MAGOUT $magcontent;
       close MAGIN;

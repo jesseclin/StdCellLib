@@ -363,7 +363,7 @@ EOF
 	# TODO: When there are HIGH-Z outputs we should split the HIGH-Z outputs from the others and give a function for output-enable and HIGH-Z
 	if($format eq "liberty")
 	{
-          print "  pin($out) {\n    direction: output;\n    function:\"";
+          print "  pin($out) {\n    direction: output;\n    function: \"";
 	}
 	elsif($format eq "testcad")
 	{
